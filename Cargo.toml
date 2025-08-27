@@ -1,0 +1,122 @@
+[package]
+name = "trading-oms"
+version = "0.1.0"
+edition = "2021"
+authors = ["Trading Systems Team Lopito"]
+description = "High-performance Order Management System in Rust"
+
+[dependencies]
+# Async runtime for high-performance I/O
+tokio = { version = "1.41", features = ["full", "rt-multi-thread", "macros", "net", "time"] }
+tokio-util = { version = "0.7", features = ["codec", "net"] }
+
+# Serialization and message handling
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+bincode = "1.3"
+
+# WebSocket and network support
+tokio-tungstenite = "0.24"
+futures-util = "0.3"
+
+# HTTP/REST API
+axum = { version = "0.7", features = ["ws", "macros"] }
+tower = { version = "0.5", features = ["util", "timeout", "limit"] }
+tower-http = { version = "0.6", features = ["cors", "trace", "compression-gzip"] }
+
+# High-performance channels and concurrency
+crossbeam-channel = "0.5"
+flume = "0.11"
+parking_lot = "0.12"
+
+# Lock-free data structures
+dashmap = "6.1"
+arc-swap = "1.7"
+
+# Time handling for latency measurement
+chrono = { version = "0.4", features = ["serde", "clock"] }
+
+# Metrics and observability
+metrics = "0.23"
+metrics-exporter-prometheus = "0.15"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json", "fmt"] }
+tracing-futures = "0.2"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+color-eyre = "0.6"
+
+# UUID for order IDs
+uuid = { version = "1.11", features = ["v4", "fast-rng", "macro-diagnostics", "serde"] }
+
+# Fast hashing
+ahash = "0.8"
+fnv = "1.0"
+
+# Configuration
+config = "0.14"
+toml = "0.8"
+
+# FIX protocol support
+quickfix = { version = "0.4", optional = true }
+
+# Database/persistence
+sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "sqlite", "postgres", "chrono", "uuid"], optional = true }
+
+# Memory allocator
+mimalloc = { version = "0.1", default-features = false }
+
+# Networking utilities
+bytes = "1.7"
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+tokio-test = "0.4"
+proptest = "1.5"
+wiremock = "0.6"
+
+[features]
+default = ["fix", "persistence"]
+fix = ["dep:quickfix"]
+persistence = ["dep:sqlx"]
+
+[profile.dev]
+opt-level = 0
+debug = true
+split-debuginfo = "unpacked"
+debug-assertions = true
+overflow-checks = true
+lto = false
+panic = "unwind"
+incremental = true
+codegen-units = 256
+
+[profile.release]
+opt-level = 3
+debug = false
+split-debuginfo = "packed"
+debug-assertions = false
+overflow-checks = false
+lto = "thin"
+panic = "abort"
+incremental = false
+codegen-units = 1
+strip = "symbols"
+
+[profile.bench]
+inherits = "release"
+debug = true
+strip = false
+
+[[bench]]
+name = "order_matching"
+harness = false
+
+[[bench]]
+name = "message_processing"
+harness = false
+
+[workspace]
+members = ["client"]
