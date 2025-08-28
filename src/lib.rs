@@ -136,8 +136,7 @@ pub mod prelude {
         DateTime, Serialize, Deserialize, Uuid, Utc,
     };
     
-    #[cfg(feature = "engine")]
-    pub use crate::engine::OmsEngine;
+    pub use crate::engine::{OmsEngine, EngineConfig, OrderValidator, ValidationConfig, ValidationResult};
     
     #[cfg(feature = "risk")]
     pub use crate::risk::{RiskEngine, RiskCheck, RiskResult};
